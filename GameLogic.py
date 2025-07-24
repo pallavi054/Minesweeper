@@ -69,7 +69,6 @@ class GameLogic:
             raise ValueError("Emtpy command. Please enter a command.")
 
         command_parts = raw_command.lower().split()
-        print("parts:  " + str(command_parts))
         token = command_parts[0]
 
         if len(command_parts) != 3:
