@@ -3,10 +3,11 @@
 # Author      : Pallavi Aggarwal
 # Version     : 7/20/2025
 # Description : This class initializes a Minesweeper board that supports game 
-#               logic. The default board is of size 9x9 with 10 randomly placed
-#               mines. The board is associated with 10 flags that the user can
-#               use to mark the suspected mines. This class contains methods
-#               to display the board cells and the number of adjacent mines.
+#               logic. Much of the board design comes from the classic '90s game
+#               design by Microsoft shown here: https://minesweeper.online/. 
+#               The board is associated with flags that the user can use to mark 
+#               the suspected mines. This class contains methods to display the 
+#               board cells and the number of adjacent mines.
 # =============================================================================
 import random  # to randomly place mines
 import time    # to time user's gameplay
@@ -20,6 +21,7 @@ class MinesweeperBoard:
     }
 
     def __init__(self, level='beginner'):  # default is beginner level
+        level = level.lower()   # accepts uppercase input
         config = MinesweeperBoard.LEVELS.get(level, MinesweeperBoard.LEVELS['beginner'])
         self.rows = config['rows']
         self.cols = config['cols']

@@ -1,14 +1,14 @@
 # =============================================================================
 # Name        : GameLogic.py
 # Author      : Ojan Salemi
-# Version     : 7/21/2025
+# Version     : 7/23/2025
 # Description : This class defines the logic of Minesweeper gameplay. This
 #               class allows the user to reveal cells and set flags, in addition
 #               to describing winning and losing conditions of the game. The
 #               user wins if all the cells are opened, all the suspected mines
 #               are flagged, and no mines are opened.
 # =============================================================================
-from MinesweeperBoard import *
+from MinesweeperBoard import MinesweeperBoard
 from collections import deque
 
 class GameLogic:
@@ -30,7 +30,7 @@ class GameLogic:
     def run(self):
         self.board.display_board()
         while self.running:
-            command = input("Use 'R row col' to reveal a cell, 'F row col' to place a flag, or 'N' to reset the game.\n")
+            command = input("\nEnter your move (e.g., 'R 3 4' to reveal row 3, col 4 | 'F 2 2' to flag | 'N' to reset):\n")
             self.process_turn(command)
 
 
@@ -40,6 +40,7 @@ class GameLogic:
             action, row, col = self.parse_input(raw_command)
         except ValueError as error_message:
             print(error_message)
+            return
 
         if action == self.QUIT:
             self.running = False
@@ -49,6 +50,7 @@ class GameLogic:
             print("Restarting the game.")
             self.first_move_done = False
             self.board = MinesweeperBoard(self.level)
+            self.board.start_timer()
             self.board.display_board()
             return
         elif action == self.REVEAL:
@@ -65,7 +67,7 @@ class GameLogic:
     #Takes a raw command from the user, processes it, and returns (action, row, column) to be used in process_turn().
     def parse_input(self, raw_command):
         if not raw_command.strip():
-            raise ValueError("Emtpy command. Please enter a command.")
+            raise ValueError("🚫 Empty command. Please enter a command.")
 
         command_parts = raw_command.lower().split()
         token = command_parts[0]
@@ -80,20 +82,20 @@ class GameLogic:
         elif token == "f":
             action = self.FLAG
         else:
-            raise ValueError("Unknown command.")
+            raise ValueError("❓ Unknown command. Please use R, F, N, or Q.")
 
         if len(command_parts) != 3:
-            raise ValueError("Invalid command.")
+            raise ValueError("⚠️ Invalid command. Should be 'R 2 3'.")
 
 
         try:
             row = int(command_parts[1]) - 1 #minus one because the coordinates for the users start with 1
             col = int(command_parts[2]) - 1
         except:
-            raise ValueError("Row and/or column not entered correctly.")
+            raise ValueError("🚫 Row and/or column not entered correctly. Must be numbers.")
 
         if row < 0 or col < 0 or row >= self.board.rows or col >= self.board.cols:
-            raise ValueError("Out of range.")
+            raise ValueError("🚫 Coordinates out of bounds.")
 
         return action, row, col
 
@@ -102,6 +104,7 @@ class GameLogic:
     def reveal_cell(self, row, col):
         #Already revealed or flagged
         if self.board.revealed[row][col] or self.board.flags[row][col]:
+            print("🚫 Cell already revealed or flagged.")
             return
 
         #Mine opened
@@ -111,25 +114,25 @@ class GameLogic:
                     if self.board.mine_positions[i][j]:
                         self.board.revealed[i][j] = True
             self.board.stop_timer()
-            self.board.smiley = "☹️"
+            self.board.smiley = "😵"
             self.running = False
             self.board.display_board()
-            print("Boom!")
-            print("Time passed: " + str(self.board.get_elapsed_time))
+            print("💥 Boom! You hit a mine. Game over.")
+            print("⏱ Time passed: " + str(self.board.get_elapsed_time()) + " seconds")
             return
 
         #BFS reveal
         queue = deque([(row, col)])
         while queue:
-            print(str(queue))
+            #print(str(queue))
             queue_row, queue_col = queue.popleft()
             if self.board.revealed[queue_row][queue_col]:
-                print("revealed?")
+                # print("revealed?")
                 continue
             self.board.revealed[queue_row][queue_col] = True
 
             if self.board.board[queue_row][queue_col] == "0":
-                print("zero?")
+                # print("zero?")
                 for diff_row in (-1, 0, 1):
                     for diff_col in (-1, 0, 1):
                         if diff_row == 0 and diff_col == 0:
@@ -140,7 +143,7 @@ class GameLogic:
                         if 0 <= new_row <self.board.rows and 0 <= new_col < self.board.cols:
                             if not self.board.revealed[new_row][new_col] and not self.board.flags[new_row][new_col]:
                                 queue.append((new_row, new_col))
-            print(str(queue))
+            # print(str(queue))
         self.check_win()
 
         #Takes a row and column position and plants a flag on that cell.
@@ -155,7 +158,7 @@ class GameLogic:
             self.board.flag_count -= 1
         else:
             if self.board.flag_count >= self.board.num_mines:
-                print("All flags have been planted. No flags remaining.")
+                print("🚧 All flags have been planted. No flags remaining.")
                 return
             self.board.flags[row][col] = True
             self.board.flag_count += 1
@@ -175,5 +178,5 @@ class GameLogic:
             self.board.smiley = "😎"
             self.running = False
             self.board.display_board()
-            print("Congratulations! You cleared all the mines!")
-            print("Time passed: " + str(self.board.get_elapsed_time()) + " seconds")
+            print("🏆 Congratulations! You cleared all the mines!")
+            print("⏱ Time passed: " + str(self.board.get_elapsed_time()) + " seconds")

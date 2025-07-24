@@ -1,24 +1,17 @@
 # =============================================================================
 # Name        : PlayMinesweeper.py
 # Author      : Ojan Salemi & Pallavi Aggarwal
-# Version     : 7/21/2025
-# Description : ...
+# Version     : 7/23/2025
+# Description : This test driver initiates a game of Minesweeper in the console.
+#               The user specifies the difficulty level (beginner, intermediate, 
+#               or expert) and a board is generated for play.
 # =============================================================================
-
-from MinesweeperBoard import *
-
-# Create a Minesweeper board
-# game = MinesweeperBoard(level='expert')
-# game = MinesweeperBoard(level='beginner')
-#game = MinesweeperBoard(level='intermediate')
-
-
-from GameLogic import *
+from GameLogic import GameLogic
 
 def main():
     print("Welcome to Console Minesweeper!")
-    diff = input("Please select a difficulity level: beginner, intermediate, expert\n")
-    game = GameLogic(diff)  # start the game
+    diff = input("\nPlease select a difficulity level: beginner, intermediate, expert\n")
+    game = GameLogic(diff)  # start the game (default game is beginner level)
     game.run()
 
 if __name__ == "__main__":
