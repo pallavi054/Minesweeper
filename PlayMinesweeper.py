@@ -16,8 +16,10 @@ from MinesweeperBoard import *
 from GameLogic import *
 
 def main():
- game = GameLogic()  # start the game
- game.run()
+    print("Welcome to Console Minesweeper!")
+    diff = input("Please select a difficulity level: beginner, intermediate, expert\n")
+    game = GameLogic(diff)  # start the game
+    game.run()
 
 if __name__ == "__main__":
  main()

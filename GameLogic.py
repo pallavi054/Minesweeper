@@ -29,7 +29,6 @@ class GameLogic:
     #Game loop driver. Asks the user for their commands in each turn.
     def run(self):
         self.board.display_board()
-        print("Welcome to Console Minesweeper!")
         while self.running:
             command = input("Use 'R row col' to reveal a cell, 'F row col' to place a flag, or 'N' to reset the game.\n")
             self.process_turn(command)
@@ -93,7 +92,7 @@ class GameLogic:
         except:
             raise ValueError("Row and/or column not entered correctly.")
 
-        if row < 0 or col < 0 or row >= self.board.rows or col >= self.board.rows:
+        if row < 0 or col < 0 or row >= self.board.rows or col >= self.board.cols:
             raise ValueError("Out of range.")
 
         return action, row, col
@@ -122,12 +121,15 @@ class GameLogic:
         #BFS reveal
         queue = deque([(row, col)])
         while queue:
+            print(str(queue))
             queue_row, queue_col = queue.popleft()
             if self.board.revealed[queue_row][queue_col]:
+                print("revealed?")
                 continue
             self.board.revealed[queue_row][queue_col] = True
 
             if self.board.board[queue_row][queue_col] == "0":
+                print("zero?")
                 for diff_row in (-1, 0, 1):
                     for diff_col in (-1, 0, 1):
                         if diff_row == 0 and diff_col == 0:
@@ -138,6 +140,7 @@ class GameLogic:
                         if 0 <= new_row <self.board.rows and 0 <= new_col < self.board.cols:
                             if not self.board.revealed[new_row][new_col] and not self.board.flags[new_row][new_col]:
                                 queue.append((new_row, new_col))
+            print(str(queue))
         self.check_win()
 
         #Takes a row and column position and plants a flag on that cell.
