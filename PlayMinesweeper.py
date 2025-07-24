@@ -13,11 +13,11 @@ from MinesweeperBoard import *
 #game = MinesweeperBoard(level='intermediate')
 
 
- from GameLogic import *
+from GameLogic import *
 
- def main():
-     game = GameLogic()  # start the game
-     game.run()
+def main():
+ game = GameLogic()  # start the game
+ game.run()
 
- if __name__ == "__main__":
-     main()
+if __name__ == "__main__":
+ main()

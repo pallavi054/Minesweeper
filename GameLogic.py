@@ -9,6 +9,7 @@
 #               are flagged, and no mines are opened.
 # =============================================================================
 from MinesweeperBoard import *
+from collections import deque
 
 class GameLogic:
 
@@ -31,7 +32,7 @@ class GameLogic:
         print("Welcome to Console Minesweeper!")
         while self.running:
             command = input("Use 'R row col' to reveal a cell, 'F row col' to place a flag, or 'N' to reset the game.\n")
-            process_turn(command)
+            self.process_turn(command)
 
 
     #Takes a string command from the user, processes it and updates the game's state.
@@ -51,7 +52,7 @@ class GameLogic:
             self.board = MinesweeperBoard(self.level)
             self.board.display_board()
             return
-        elif action == self.reveal:
+        elif action == self.REVEAL:
             if not self.first_move_done:
                 self.board.start_timer()
                 self.first_move_done = True
@@ -68,14 +69,15 @@ class GameLogic:
             raise ValueError("Emtpy command. Please enter a command.")
 
         command_parts = raw_command.lower().split()
+        print("parts:  " + str(command_parts))
         token = command_parts[0]
 
-        if len(parts) != 3:
+        if len(command_parts) != 3:
             raise ValueError("Invalid command.")
 
-        if token == "q" || token == "quit":
+        if token == "q" or token == "quit":
             return self.QUIT, None, None
-        elif token == "N":
+        elif token == "n":
             return self.ACTION_NEW, None, None
         elif token == "r":
             action = self.REVEAL
@@ -85,12 +87,12 @@ class GameLogic:
             raise ValueError("Unknown command.")
 
         try:
-            row = int(parts[1]) - 1 #minus one because the coordinates for the users start with 1
-            col = int(parts[2]) - 1
+            row = int(command_parts[1]) - 1 #minus one because the coordinates for the users start with 1
+            col = int(command_parts[2]) - 1
         except:
             raise ValueError("Row and/or column not entered correctly.")
 
-        if row < 0 || col < 0 || row >= self.board.rows || col >= self.board.rows:
+        if row < 0 or col < 0 or row >= self.board.rows or col >= self.board.rows:
             raise ValueError("Out of range.")
 
         return action, row, col
@@ -117,8 +119,7 @@ class GameLogic:
             return
 
         #BFS reveal
-        if self.board.board
-        queue = deque([row, col])
+        queue = deque([(row, col)])
         while queue:
             queue_row, queue_col = queue.popleft()
             if self.board.revealed[queue_row][queue_col]:
@@ -139,36 +140,36 @@ class GameLogic:
         self.check_win()
 
         #Takes a row and column position and plants a flag on that cell.
-        def plant_flag(self, row, col):
-            if self.board.revealed[row][col]:
-                print("Already revealed. Cannot plant a flag here.")
+    def plant_flag(self, row, col):
+        if self.board.revealed[row][col]:
+            print("Already revealed. Cannot plant a flag here.")
+            return
+
+        #removing flag
+        if self.board.flags[row][col]:
+            self.board.flags[row][col] = False
+            self.board.flag_count -= 1
+        else:
+            if self.board.flag_count >= self.board.num_mines:
+                print("All flags have been planted. No flags remaining.")
                 return
+            self.board.flags[row][col] = True
+            self.board.flag_count += 1
+        self.check_win()
 
-            #removing flag
-            if self.board.flags[row][col]:
-                self.board.flags[row][col] = False
-                self.board.flag_count -= 1
-            else:
-                if self.board.flag_count >= self.board.num_mines:
-                    print("All flags have been planted. No flags remaining.")
-                    return
-                self.board.flags[row][col] = True
-                self.board.flag_count += 1
-            self.check_win()
+    #Checks to see if the user has won.
+    def check_win(self):
+        clear_total = self.board.rows * self.board.cols - self.board.num_mines
+        revealed_total = 0
+        for row in self.board.revealed:
+            for cell in row:
+                if cell:
+                    revealed_total += 1
 
-        #Checks to see if the user has won.
-        def check_win(self):
-            clear_total = self.board.rows * self.board.cols - self.board.num_mines
-            revealed_total = 0
-            for row in self.board.revealed:
-                for cell in row:
-                    if cell:
-                        revealed_total += 1
-
-            if revealed_total == clear_total:
-                self.board.stop_timer()
-                self.board.smiley = "😎"
-                self.running = False
-                self.board.display_board()
-                print("Congratulations! You cleared all the mines!")
-                print("Time passed: " + str(self.board.get_elapsed_time()) + " seconds")
+        if revealed_total == clear_total:
+            self.board.stop_timer()
+            self.board.smiley = "😎"
+            self.running = False
+            self.board.display_board()
+            print("Congratulations! You cleared all the mines!")
+            print("Time passed: " + str(self.board.get_elapsed_time()) + " seconds")
