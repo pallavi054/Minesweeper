@@ -71,19 +71,21 @@ class GameLogic:
         command_parts = raw_command.lower().split()
         token = command_parts[0]
 
-        if len(command_parts) != 3:
-            raise ValueError("Invalid command.")
 
         if token == "q" or token == "quit":
             return self.QUIT, None, None
         elif token == "n":
-            return self.ACTION_NEW, None, None
+            return self.NEW_GAME, None, None
         elif token == "r":
             action = self.REVEAL
         elif token == "f":
             action = self.FLAG
         else:
             raise ValueError("Unknown command.")
+
+        if len(command_parts) != 3:
+            raise ValueError("Invalid command.")
+
 
         try:
             row = int(command_parts[1]) - 1 #minus one because the coordinates for the users start with 1
